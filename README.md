@@ -39,8 +39,8 @@ You can press:
 Add the following to your `.tmux.conf`: 
 ```
 set -g @plugin 'eemed/tmux-picker'
-
 ```
+
 Install using (<kbd>prefix</kbd> + <kbd>i</kbd>) and you should be good to go.
 
 # Configuration
