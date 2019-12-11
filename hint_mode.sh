@@ -131,12 +131,12 @@ function run_picker_copy_command() {
     local result="$1"
     local hint="$2"
 
-    is_uppercase=$(echo "$input" | grep -E '^[a-z]+$' &> /dev/null; echo $?)
+    is_lower=$([[ $input =~ [A-Z] ]]; echo $?)
 
-    if [[ $is_uppercase == "1" ]] && [ ! -z "$PICKER_COPY_COMMAND_UPPERCASE" ]; then
-        command_to_run="$PICKER_COPY_COMMAND_UPPERCASE"
-    elif [ ! -z "$PICKER_COPY_COMMAND" ]; then
-        command_to_run="$PICKER_COPY_COMMAND"
+    if [[ $is_lower == "0" ]] && [ ! -z "$PICKER_UPPERCASE_COMMAND" ]; then
+        command_to_run="$PICKER_UPPERCASE_COMMAND"
+    elif [ ! -z "$PICKER_COMMAND" ]; then
+        command_to_run="$PICKER_COMMAND"
     fi
 
     if [[ ! -z "$command_to_run" ]]; then

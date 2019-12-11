@@ -8,7 +8,7 @@ This is a slimmed-down, improved and extended fork of [tmux-fingers](https://git
 
 # Usage
 
-Press ( <kbd>Meta</kbd> + <kbd>F</kbd> ) to enter **[picker]** hint mode, in which relevant stuff (e.g. file paths, git SHAs) in the current
+Press ( <kbd>prefix</kbd> + <kbd>F</kbd> ) to enter **[picker]** hint mode, in which relevant stuff (e.g. file paths, git SHAs) in the current
 pane will be highlighted along with letter hints. By pressing those letters, the highlighted match will be copied to the system clipboard.
 
 By default, following items are highlighted:
@@ -27,24 +27,63 @@ You can press:
 
 # Installation
 
+## Manual
+
 * Clone the repo: `git clone https://github.com/pawel-wiejacha/tmux-picker ~/.tmux/tmux-picker`
 * Add `run-shell ~/.tmux/tmux-picker/tmux-picker.tmux` to your `~/.tmux.conf`
 * Reload tmux config by running: `tmux source-file ~/.tmux.conf`
 
+
+## TPM
+
+Add the following to your `.tmux.conf`: 
+```
+set -g @plugin 'eemed/tmux-picker'
+
+```
+Install using (<kbd>prefix</kbd> + <kbd>i</kbd>) and you should be good to go.
+
 # Configuration
 
-- Edit `~/.tmux/tmux-picker/tmux-picker.tmux`, where you can change:
-    - `PICKER_KEY` (default <kbd>Meta</kbd> + <kbd>F</kbd>, without the prefix)
-    - `PATTERNS_LIST1` - regex patterns highlighted after pressing `PICKER_KEY`
-    - `PATTERNS_LIST2` - regex patterns highlighted after pressing <kbd>SPACE</kbd> in hint mode 
-    - `BLACKLIST` - regex pattern describing items that will not be highlighted
-    - `PICKER_COPY_COMMAND` - command to execute on highlighted item
-        - default is: `xclip -f -in -sel primary | xclip -in -sel clipboard`, which copies item to clipboard
-    - `PICKER_COPY_COMMAND_UPPERCASE` - command to execute on highlighted item, when hint was typed using uppercase letters
-        - default is `bash -c 'arg=\$(cat -); tmux split-window -h -c \"#{pane_current_path}\" vim \"\$arg\"'`, which executes `vim` in a sidebar
-    - `PICKER_HINT_FORMAT` - describes hint color/style.
-        - Default is `#[fg=black,bg=red,bold]`, but `#[fg=color0,bg=color202,dim,bold]%s` is IMO better if your terminal supports 256 colors
-    - `PICKER_HIGHLIGHT_FORMAT` - describes highlighted item color/style
+NOTE: for changes to take effect, you'll need to source again your `.tmux.conf` file.
+
+## @picker-key
+
+`default: F`
+
+Customize how to enter picker mode. To use without prefix use `-n M-f`
+
+For example:
+
+```
+set -g @picker-key F
+```
+
+## @picker-command
+
+`default: xsel --clipboard -f`
+
+By default **tmux-picker** will just yank matches to the system clipboard.
+
+If you want to set your own custom command you can do so like this:
+
+```
+set -g @picker-command 'xclip -selection clipboard'
+```
+
+This command will also receive the copied text. Using `stdin`.
+
+## @picker-uppercase-command
+
+`default: tmux set-buffer \"\$(cat -)\"; tmux paste-buffer`
+
+This command will also receive the copied text. Using `stdin`.
+
+For example to open using `xdg-open`:
+
+```
+set -g @picker-uppercase-command 'xargs xdg-open'
+```
 
 # Requirements
 
@@ -52,16 +91,11 @@ You can press:
 * bash 4+
 * gawk 4.1+ (which was released in 2013)
 
-# Troubleshooting
-
-- <kbd>Meta</kbd> + <kbd>F</kbd> does not work in copy mode
-    - Set `set-option -g mode-keys vi`, adjust your key bindings or change `PICKER_KEY`
-
 # Acknowledgements
 
 It started as a fork of [tmux-fingers](https://github.com/Morantron/tmux-fingers). I would like to thank to [Morantron](https://github.com/Morantron) (the tmux-fingers author) for a really good piece of code!
 
-My main problem with tmux-fingers was that it did not support terminal colors (it strips them down). I have fancy powerline prompt, colored `ls`, zsh syntax highlighting, colored git output, etc. So after entering tmux-fingers hint mode it was like *'WTF? Where are all my colors? Where am I? Where's the item I want to highlight??!'*. I could enable capturing escape sequences for colors in `tmux capture-pane`, but it would break tmux-fingers pattern matching. 
+My main problem with tmux-fingers was that it did not support terminal colors (it strips them down). I have fancy powerline prompt, colored `ls`, zsh syntax highlighting, colored git output, etc. So after entering tmux-fingers hint mode it was like *'WTF? Where are all my colors? Where am I? Where's the item I want to highlight??!'*. I could enable capturing escape sequences for colors in `tmux capture-pane`, but it would break tmux-fingers pattern matching.
 
 My other problem with tmux-fingers was that it was sluggish. So I started adding color support to `tmux-fingers` and improving its performance. I had to simplify things to make it reliable. I completely rewrote awk part, added Huffman Coding, added second hint mode. I therefore decided to fork and rename project instead of submitting pull requests that turn things upside down.
 
@@ -72,13 +106,13 @@ Comparing to tmux-fingers, tmux-picker:
 - **supports terminal colors** (does not strip color escape codes)
 - uses Huffman Coding to generate hints (**shorter hints**, less typing)
     - and supports unlimited number of hints
-- is **noticeably faster** 
+- is **noticeably faster**
     - and does not have redraw glitches
 - has **better patterns** and **two modes** (with different pattern sets)
     - and blacklist pattern
 - is self-contained, smaller and easier to hack
 
-Like tmux-fingers, tmux-picker still supports: 
+Like tmux-fingers, tmux-picker still supports:
 
 - hints in copy-mode
 - split windows/multiple panes
@@ -93,7 +127,7 @@ The basic idea is:
 
 - create auxiliary pane with the same width and height as the current pane
 - `tmux capture-pane -t $current_pane | gawk -f find-and-highlight-patterns.awk` to auxiliary pane
-- swap panes (the easiest way not to break things like copy-mode) 
+- swap panes (the easiest way not to break things like copy-mode)
 - read typed keys and execute user command on selected item
 
 # License

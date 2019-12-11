@@ -27,7 +27,7 @@ function array_join() {
 #
 
 # Every pattern have be of form ((A)B) where:
-#  - A is part that will not be highlighted (e.g. escape sequence, whitespace) 
+#  - A is part that will not be highlighted (e.g. escape sequence, whitespace)
 #  - B is part will be highlighted (can contain subgroups)
 #
 # Valid examples:
@@ -75,25 +75,43 @@ BLACKLIST=(
 
 # "-n M-f" for Alt-F without prefix
 # "f" for prefix-F
-PICKER_KEY="-n M-f" 
+DEFAULT_PICKER_KEY="F"
+PICKER_KEY=$(tmux show-option -gqv @picker-key)
+PICKER_KEY=${PICKER_KEY:-$DEFAULT_PICKER_KEY}
 
 set_tmux_env PICKER_PATTERNS1 $(array_join "|" "${PATTERNS_LIST1[@]}")
 set_tmux_env PICKER_PATTERNS2 $(array_join "|" "${PATTERNS_LIST2[@]}")
 set_tmux_env PICKER_BLACKLIST_PATTERNS $(array_join "|" "${BLACKLIST[@]}")
 
-set_tmux_env PICKER_COPY_COMMAND "xclip -f -in -sel primary | xclip -in -sel clipboard"
-set_tmux_env PICKER_COPY_COMMAND_UPPERCASE "bash -c 'arg=\$(cat -); tmux split-window -h -c \"#{pane_current_path}\" vim \"\$arg\"'"
+DEFAULT_COMMAND="xsel --clipboard -f"
+COMMAND=$(tmux show-option -gqv @picker-command)
+COMMAND=${COMMAND:-$DEFAULT_COMMAND}
+set_tmux_env PICKER_COMMAND "$COMMAND"
+
+DEFAULT_UPPERCASE_COMMAND="tmux set-buffer \"\$(cat -)\"; tmux paste-buffer"
+UPPERCASE_COMMAND=$(tmux show-option -gqv @picker-uppercase-command)
+UPPERCASE_COMMAND=${UPPERCASE_COMMAND:-$DEFAULT_UPPERCASE_COMMAND}
+set_tmux_env PICKER_UPPERCASE_COMMAND "$UPPERCASE_COMMAND"
 
 #set_tmux_env PICKER_HINT_FORMAT $(process_format "#[fg=color0,bg=color202,dim,bold]%s")
-set_tmux_env PICKER_HINT_FORMAT $(process_format "#[fg=black,bg=red,bold]%s")
+
+DEFAULT_PICKER_HINT_FORMAT="#[fg=color0,bg=color202,dim,bold]%s"
+PICKER_HINT_FORMAT=$(tmux show-option -gqv @picker-hint-format)
+PICKER_HINT_FORMAT=${PICKER_HINT_FORMAT:-$DEFAULT_PICKER_HINT_FORMAT}
+set_tmux_env PICKER_HINT_FORMAT $(process_format $PICKER_HINT_FORMAT)
 set_tmux_env PICKER_HINT_FORMAT_NOCOLOR "%s"
 
 #set_tmux_env PICKER_HIGHLIGHT_FORMAT $(process_format "#[fg=black,bg=color227,normal]%s")
-set_tmux_env PICKER_HIGHLIGHT_FORMAT $(process_format "#[fg=black,bg=yellow,bold]%s")
+
+DEFAULT_PICKER_HL_FORMAT="#[fg=black,bg=yellow,bold]%s"
+PICKER_HL_FORMAT=$(tmux show-option -gqv @picker-highlight-format)
+PICKER_HL_FORMAT=${PICKER_HL_FORMAT:-$DEFAULT_PICKER_HL_FORMAT}
+set_tmux_env PICKER_HINT_FORMAT $(process_format $PICKER_HINT_FORMAT)
+set_tmux_env PICKER_HIGHLIGHT_FORMAT $(process_format $PICKER_HL_FORMAT)
 
 #
 # BIND
 #
 
-tmux bind $(echo "$PICKER_KEY") run-shell "$CURRENT_DIR/tmux-picker.sh"
+tmux bind-key $PICKER_KEY run-shell "$CURRENT_DIR/tmux-picker.sh"
 

@@ -18,16 +18,16 @@ def generate_hints(num_hints_needed):
         if num_hints_needed <= alphabet_size:
             first_step_num_children = num_hints_needed
         else:
-            first_step_num_children = [m for m in range(2, num_hints_needed) 
-                    if m % (alphabet_size - 1) == num_hints_needed % (alphabet_size - 1)][0] 
+            first_step_num_children = [m for m in range(2, num_hints_needed)
+                    if m % (alphabet_size - 1) == num_hints_needed % (alphabet_size - 1)][0]
 
         while len(heap) > 1:
             children = []
             while len(heap) > 0 and len(children) < first_step_num_children:
                 children.append(heapq.heappop(heap))
 
-            new_node = (sum(node[0] for node in children), 
-                    sum([node[1] for node in children], []), 
+            new_node = (sum(node[0] for node in children),
+                    sum([node[1] for node in children], []),
                     [node for node in children])
             heapq.heappush(heap, new_node)
             first_step_num_children = alphabet_size
