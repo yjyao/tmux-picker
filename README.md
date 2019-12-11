@@ -56,7 +56,7 @@ Customize how to enter picker mode. To use without prefix use `-n M-f`
 For example:
 
 ```
-set -g @picker-key F
+set -g @picker-key '-n M-f'
 ```
 
 ## @picker-command
@@ -71,13 +71,13 @@ If you want to set your own custom command you can do so like this:
 set -g @picker-command 'xclip -selection clipboard'
 ```
 
-This command will also receive the copied text. Using `stdin`.
+This command will also receive the copied text using `stdin`.
 
 ## @picker-uppercase-command
 
 `default: tmux set-buffer \"\$(cat -)\"; tmux paste-buffer`
 
-This command will also receive the copied text. Using `stdin`.
+This command will also receive the copied text using `stdin`.
 
 For example to open using `xdg-open`:
 
