@@ -10,8 +10,8 @@ BEGIN {
     hint_format = ENVIRON["PICKER_HINT_FORMAT"]
     hint_format_nocolor = ENVIRON["PICKER_HINT_FORMAT_NOCOLOR"]
     hint_format_len = length(sprintf(hint_format_nocolor, ""))
+    hint_front = ENVIRON["PICKER_HINT_FRONT"]
     highlight_format = ENVIRON["PICKER_HIGHLIGHT_FORMAT"]
-    compound_format = hint_format highlight_format
 
     # run gen_hints.py to (re-)generate it: 
     if (num_hints_needed <= 17) {
@@ -76,8 +76,13 @@ BEGIN {
             }
 
             hint_len = length(hint) + hint_format_len;
-            line_match = substr(line_match, hint_len + 1, length(line_match) - hint_len);
-            line_match = sprintf(compound_format, hint, line_match);
+            if (hint_front) {
+              line_match = substr(line_match, hint_len + 1, length(line_match) - hint_len);
+              line_match = sprintf(hint_format highlight_format, hint, line_match);
+            } else {
+              line_match = substr(line_match, 0, length(line_match) - hint_len);
+              line_match = sprintf(highlight_format hint_format, line_match, hint);
+            }
 
             # Fix colors broken by the hints highlighting.
             # This is mostly needed to keep prompts intact, so fix first ~500 chars only

@@ -85,6 +85,18 @@ For example to open using `xdg-open`:
 set -g @picker-uppercase-command 'xargs xdg-open'
 ```
 
+## @picker-hint-front
+
+`default: 1`
+
+Whether to show hints
+at the front
+or back of the matched text.
+By default,
+hints appear at the front of matches.
+To show hints at the back,
+set the value to `0`.
+
 # Requirements
 
 * tmux 2.2+
