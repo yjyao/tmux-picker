@@ -97,6 +97,21 @@ hints appear at the front of matches.
 To show hints at the back,
 set the value to `0`.
 
+## @picker-unmatched-format
+
+`default: "%s"`
+
+Highlight format of the unmatched text.
+By default,
+tmux-picker does not modify the unmatched format.
+
+If you want extra contrast in the hinting,
+you can dim the unmatched text with the following:
+
+```
+set -g @picker-unmatched-format "#[dim]%s"
+```
+
 # Requirements
 
 * tmux 2.2+

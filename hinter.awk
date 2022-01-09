@@ -12,6 +12,7 @@ BEGIN {
     hint_format_len = length(sprintf(hint_format_nocolor, ""))
     hint_front = ENVIRON["PICKER_HINT_FRONT"]
     highlight_format = ENVIRON["PICKER_HIGHLIGHT_FORMAT"]
+    unmatched_format = ENVIRON["PICKER_UNMATCHED_FORMAT"]
 
     # run gen_hints.py to (re-)generate it: 
     if (num_hints_needed <= 17) {
@@ -64,6 +65,7 @@ BEGIN {
                 if (matches[i] != "") {
                     line_match = substr(line_match, 1 + matches[++i, "length"])
                     pre_match = pre_match matches[i]
+                    pre_match = sprintf(unmatched_format, pre_match);
                     break;
                 }
             }
@@ -99,6 +101,7 @@ BEGIN {
         line = post_match;
     }
 
+    post_match = sprintf(unmatched_format, post_match);
     printf "\n%s", (output_line skipped_prefix post_match)
 }
 
